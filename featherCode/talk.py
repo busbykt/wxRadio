@@ -1,4 +1,4 @@
-# Talker Code
+# Talk
 import board
 import busio
 import digitalio
@@ -19,7 +19,7 @@ cs = digitalio.DigitalInOut(board.RFM9X_CS)
 reset = digitalio.DigitalInOut(board.RFM9X_RST)
 
 rfm9x = adafruit_rfm9x.RFM9x(spi, cs, reset, 915.0)
-rfm9x.tx_power=7
+rfm9x.tx_power=15
 
 while True:
 
@@ -28,7 +28,7 @@ while True:
     packet = rfm9x.receive(timeout=3.0)
 
     # gather environmental data from sensor
-    temp = round(envSensor.temperature*9/5+32,0)
+    temp = round(envSensor.temperature*9/5+32,2)
     humidity = round(envSensor.humidity,2)
     pressure = round(envSensor.pressure,2)
 

@@ -36,4 +36,4 @@ while True:
 
         # tell weather station we received data
         rfm9x.send('Data received')        
-        time.sleep(3)
+        time.sleep(2)

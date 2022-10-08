@@ -5,6 +5,7 @@ from dash import Dash, dcc, html
 import plotly.express as px
 import pandas as pd
 import numpy as np
+import sqlite3
 
 app = Dash(__name__)
 
@@ -20,10 +21,8 @@ df = pd.read_csv(
     names=['Temperature','Humidity','Pressure']
 )
 
-# assume you have a "long-form" data frame
-# see https://plotly.com/python/px-arguments/ for more options
+# generate the temp/humidity graph
 fig = px.line(df, x=df.index, y=['Temperature','Humidity'])
-
 fig.update_layout(
     plot_bgcolor=colors['background'],
     paper_bgcolor=colors['background'],
@@ -32,28 +31,50 @@ fig.update_layout(
 fig.update_xaxes(showgrid=False)
 fig.update_yaxes(showgrid=False)
 
+# generate the pressure graph
+mbarFig = px.line(df, x=df.index, y=['Pressure'])
+mbarFig.update_layout(
+    plot_bgcolor=colors['background'],
+    paper_bgcolor=colors['background'],
+    font_color=colors['text']
+)
+mbarFig.update_xaxes(showgrid=False)
+mbarFig.update_yaxes(showgrid=False)
+mbarFig.update_traces(line_color='#66eb59')
+
+# layout the app
 app.layout = html.Div(style={'backgroundColor': colors['background']}, children=[
     html.H1(
-        children='Aerial Paragliding Launch Conditions',
+        children='Wx Station Conditions',
         style={
             'textAlign': 'center',
             'color': colors['text']
         }
     ),
 
-    html.Div(children=f"Temperature {df.iloc[-1]['Temperature']}", style={
+    html.H3(children=f"Temperature {df.iloc[-1]['Temperature']} F", style={
         'textAlign': 'center',
         'color': colors['text']
     }),
     
-    html.Div(children=f"Humidity {df.iloc[-1]['Humidity']}", style={
+    html.H3(children=f"Humidity {df.iloc[-1]['Humidity']}%", style={
+        'textAlign': 'center',
+        'color': colors['text']
+    }),
+    
+    html.H3(children=f"Pressure {df.iloc[-1]['Pressure']} mBar", style={
         'textAlign': 'center',
         'color': colors['text']
     }),
 
     dcc.Graph(
-        id='example-graph-2',
+        id='tempHumGraph',
         figure=fig
+    ),
+
+    dcc.Graph(
+        id='pressureGraph',
+        figure=mbarFig
     )
 ])
 
