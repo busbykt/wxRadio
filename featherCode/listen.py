@@ -3,6 +3,7 @@ import board
 import busio
 import digitalio
 import time
+import gc
 
 spi = busio.SPI(board.SCK, MOSI=board.MOSI, MISO=board.MISO)
 
@@ -16,6 +17,7 @@ rfm9x.tx_power = 10
 uart = busio.UART(board.TX, board.RX, baudrate=9600)
 
 while True:
+    gc.collect()
     # wait to receive weather data
     packet = rfm9x.receive(timeout=5.0)
     if packet is None:
