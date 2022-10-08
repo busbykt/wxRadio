@@ -23,7 +23,11 @@ while True:
     if packet is None:
         print('No data received')
     else:
-        packet_text = str(packet, 'ascii')
+        try:
+            packet_text = str(packet,'ascii')
+        except UnicodeError:
+            continue
+            
         print('Received reply: {0}'.format(packet_text))
         print("Received signal strength: {0} dB".format(rfm9x.last_rssi))
 
@@ -31,5 +35,5 @@ while True:
         uart.write(packet)
 
         # tell weather station we received data
-        rfm9x.send('Data received')
+        rfm9x.send('Data received')        
         time.sleep(3)

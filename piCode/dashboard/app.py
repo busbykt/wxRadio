@@ -13,23 +13,15 @@ colors = {
     'text': '#7FDBFF'
 }
 
-# dummy data
-steps=200
-Tsteps = np.random.choice([-1,0,1],size=steps)
-Hsteps = np.random.choice([-1,0,1],size=steps)
-Psteps = np.random.choice([-1,0,1],size=steps)
-T=np.concatenate([[75],Tsteps]).cumsum(0)
-H=np.concatenate([[50],Hsteps]).cumsum(0)
-P=np.concatenate([[1013.25],Psteps]).cumsum(0)
+# read in data
+df = pd.read_csv(
+    '../wxData.csv',
+    header=None,
+    names=['Temperature','Humidity','Pressure']
+)
 
 # assume you have a "long-form" data frame
 # see https://plotly.com/python/px-arguments/ for more options
-df = pd.DataFrame({
-    "Temperature": T,
-    "Humidity": H,
-    "Pressure": P
-})
-
 fig = px.line(df, x=df.index, y=['Temperature','Humidity'])
 
 fig.update_layout(
