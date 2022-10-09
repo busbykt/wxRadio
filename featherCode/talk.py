@@ -32,7 +32,7 @@ while True:
     humidity = round(envSensor.humidity,2)
     pressure = round(envSensor.pressure,2)
 
-    packetText = str(f'T:{temp},H:{humidity},P:{pressure}', "ascii")
+    packetText = str(f'ZXT:{temp},H:{humidity},P:{pressure}QV', "ascii")
     print(packetText)
 
     # If no packet was received during the timeout then None is returned.

@@ -24,7 +24,7 @@ con.close()
 # read in from serial
 while True:
     try:
-        wxData = uart.read(30)
+        wxData = uart.read(35)
     except:
         wxData=None
     
@@ -34,13 +34,13 @@ while True:
         print(data)
         # check to see if array has necessary components
         checks=['T','H','P']
-        if sum([chars in data for chars in checks]) < 3:
+        if not (data.startswith('ZX') and data.endswith('QV')):
             print('missing data')
             time.sleep(.5)
             continue
         
         # clean up data
-        data = re.sub('[T:PH]','',data)
+        data = re.sub('[ZXT:PHQV]','',data)
         print(data)
         
         # connect to db
