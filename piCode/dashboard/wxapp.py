@@ -5,7 +5,8 @@ from dash import Dash, dcc, html
 import plotly.express as px
 import pandas as pd
 import numpy as np
-import sqlite3
+import sqlalchemy as sa
+from sqlalchemy import text
 
 app = Dash(__name__)
 
@@ -14,19 +15,20 @@ colors = {
     'text': '#7FDBFF'
 }
 
+with open('mysql.txt') as f:
+    mysqlp = f.read()
+
 def getLatest():
     
     # create connection to database
-    con = sqlite3.connect('../wx.db')
+    engine = sa.create_engine(f"mysql+mysqldb://busbykt:pythonanywhere@busbykt.mysql.pythonanywhere-services.com/busbykt$wxdb")
 
     # query for data to plot
     query = '''
-    SELECT Temperature,Humidity,Pressure FROM wxData ORDER BY rowid Desc LIMIT 2
+    SELECT DateTime,Temperature,Humidity,Pressure FROM wxData ORDER BY DateTime Desc LIMIT 2
     '''
     # read in data
-    df = pd.read_sql_query(query,con)
-    # close connection
-    con.close()
+    df = pd.read_sql_query(query,engine)
     
     return df.iloc[-1]['Temperature'],df.iloc[-1]['Humidity'],df.iloc[-1]['Pressure']
 
@@ -34,17 +36,15 @@ def getLatest():
 def getTempHumPress():
     
     # create connection to database
-    con = sqlite3.connect('../wx.db')
+    engine = sa.create_engine(f'mysql+mysqldb://busbykt:pythonanywhere@busbykt.mysql.pythonanywhere-services.com/busbykt$wxdb')
 
     # query for data to plot
     query = '''
-    SELECT DateTime,Temperature,Humidity,Pressure FROM wxData ORDER BY DateTime DESC LIMIT 8000
+    SELECT DateTime,Temperature,Humidity,Pressure FROM wxData ORDER BY DateTime DESC LIMIT 4000
     '''
     
     # read in data
-    df = pd.read_sql_query(query,con)
-    # close connection
-    con.close()
+    df = pd.read_sql_query(query,engine)
     
     # localize time
     df['DateTime'] = df['DateTime'].astype('datetime64[ns]')
@@ -132,4 +132,4 @@ def serveLayout():
 app.layout = serveLayout
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server()
