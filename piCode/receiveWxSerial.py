@@ -1,25 +1,27 @@
-
 import time
 import busio
 import board
 from digitalio import DigitalInOut
 import serial
 import re
-import sqlite3
+import sqlalchemy
+import sshtunnel
+import MySQLdb
+
+# read in mysql credentials
+with open('./dashboard/mysql.txt') as f:
+    mysqlp = f.read()
+
+# read in ssh credentials
+with open('./dashboard/sshcreds.txt') as f:
+    sshCreds = f.read()
 
 # set up a serial connection
 uart = serial.Serial('/dev/serial0', baudrate=9600,timeout=5)
 
-# set up the local database
-con = sqlite3.connect('wx.db')
-# create a cursor
-cur = con.cursor()
-# check if table already exists
-if cur.execute('SELECT name FROM sqlite_master WHERE name="wxData"').fetchone() is None:
-    print('creating table')
-    # create table if it does not exist
-    cur.execute('CREATE TABLE wxData(DateTime,Temperature,Humidity,Pressure,WindSpeed,WindDir)')
-con.close()
+# set up sshtunnel
+sshtunnel.SSH_TIMEOUT = 30.0
+sshtunnel.TUNNEL_TIMEOUT = 30.0
 
 # read in from serial
 while True:
@@ -43,21 +45,29 @@ while True:
         data = re.sub('[ZXT:PHQV]','',data)
         print(data)
         
-        # connect to db
-        con = sqlite3.connect('wx.db')
-        # create a cursor
-        cur = con.cursor()        
-        # write data to database
-        cur.execute(f'''
-            INSERT INTO wxData VALUES
-                (datetime('now'),{data},'missing','missing')
-        ''')
-        # commit transaction
-        con.commit()
-        # close connection
-        con.close()
+        with sshtunnel.SSHTunnelForwarder(
+            ('ssh.pythonanywhere.com'),
+            ssh_username='busbykt', ssh_password=f'{sshCreds}',
+            remote_bind_address=('busbykt.mysql.pythonanywhere-services.com',3306)
+        ) as tunnel:
         
-        with open('wxData.csv', mode='a') as f:
-            f.write(data+'\n')
+            # connect to remote mysql db
+            wxdb = MySQLdb.connect(
+                user='busbykt',
+                passwd=f'{mysqlp}',
+                host='127.0.0.1', port=tunnel.local_bind_port,
+                db='busbykt$wxdb'
+            )
+            # create a cursor 
+            cur = wxdb.cursor()
+            # write to database
+            cur.execute(f'''
+               INSERT INTO wxData VALUES
+                (NOW(),{data},0,0)
+            ''')
+            # commit transaction
+            wxdb.commit()
+            # close
+            cur.close()
     
     time.sleep(.5)
