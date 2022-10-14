@@ -45,29 +45,32 @@ while True:
         data = re.sub('[ZXT:PHQV]','',data)
         print(data)
         
-        with sshtunnel.SSHTunnelForwarder(
-            ('ssh.pythonanywhere.com'),
-            ssh_username='busbykt', ssh_password=f'{sshCreds}',
-            remote_bind_address=('busbykt.mysql.pythonanywhere-services.com',3306)
-        ) as tunnel:
+        try:
+            with sshtunnel.SSHTunnelForwarder(
+                ('ssh.pythonanywhere.com'),
+                ssh_username='busbykt', ssh_password=f'{sshCreds}',
+                remote_bind_address=('busbykt.mysql.pythonanywhere-services.com',3306)
+            ) as tunnel:
+            
+                # connect to remote mysql db
+                wxdb = MySQLdb.connect(
+                    user='busbykt',
+                    passwd=f'{mysqlp}',
+                    host='127.0.0.1', port=tunnel.local_bind_port,
+                    db='busbykt$wxdb'
+                )
+                # create a cursor 
+                cur = wxdb.cursor()
+                # write to database
+                cur.execute(f'''
+                   INSERT INTO wxData VALUES
+                    (NOW(),{data},0,0)
+                ''')
+                # commit transaction
+                wxdb.commit()
+                # close
+                cur.close()
+        except:
+            continue
         
-            # connect to remote mysql db
-            wxdb = MySQLdb.connect(
-                user='busbykt',
-                passwd=f'{mysqlp}',
-                host='127.0.0.1', port=tunnel.local_bind_port,
-                db='busbykt$wxdb'
-            )
-            # create a cursor 
-            cur = wxdb.cursor()
-            # write to database
-            cur.execute(f'''
-               INSERT INTO wxData VALUES
-                (NOW(),{data},0,0)
-            ''')
-            # commit transaction
-            wxdb.commit()
-            # close
-            cur.close()
-    
     time.sleep(.5)
