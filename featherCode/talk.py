@@ -26,13 +26,48 @@ rfm9x.tx_power=15
 D11 = digitalio.DigitalInOut(board.D11)
 D11.switch_to_input(pull=digitalio.Pull.UP)
 
-while True:
+# wind directon
+A5 = AnalogIn(board.A5)
 
-    gc.collect()
-    # Wait for confirmation from listener
-    packet = rfm9x.receive(timeout=3.0)
-    
-    # get wind speed
+# wind direction dictionary
+wDir = {
+    'N':50000,
+    'NNE':26000,
+    'NE':29000,
+    'ENE':5500,
+    'E':6000,
+    'ESE':4000,
+    'SE':12000,
+    'SSE':8000,
+    'S':18000,
+    'SSW':16000,
+    'SW':40000,
+    'WSW':38500,
+    'W':60000,
+    'WNW':53000,
+    'NW':56300,
+    'NNW':45000
+}
+
+def getWindDir():
+    '''
+    Reads wind vane analog input counts
+    '''
+    minDist=100000
+    curDir = A5.value
+    for direction in wDir:
+        # compute the counts away from each distance
+        dist = abs(curDir-wDir[direction])
+        if dist < minDist:
+            minDist = dist
+            bestDirection = direction
+   
+    return bestDirection
+
+def getWindSpeed():
+    '''
+    Polls anemometer for current wind speed
+    '''
     curTime, count, lastValue = 0,0,0
     window = 2
     fixedTime = time.monotonic() # millisecond timer
@@ -51,9 +86,22 @@ while True:
             lastValue=0
             time.sleep(.01)
         curTime = time.monotonic()
-        
     # compute wind speed in mph
     windSpeed = round(count*1.492 / window,1)
+    
+    return windSpeed
+
+while True:
+
+    gc.collect()
+    # Wait for confirmation from listener
+    packet = rfm9x.receive(timeout=3.0)
+
+    # get wind speed
+    windSpeed = getWindSpeed()
+        
+    # get wind direction
+    windDir = getWindDir()
 
     # gather environmental data from sensor
     temp = round(envSensor.temperature*9/5+32,1)
@@ -63,6 +111,7 @@ while True:
     packetText = str(f'ZXT:{temp},H:{humidity},P:{pressure}QV', "ascii")
     print(packetText)
     print(f'wind speed {windSpeed}')
+    print(f'wind dir {windDir}')
 
     # If no packet was received during the timeout then None is returned.
     if packet is None:
