@@ -94,7 +94,7 @@ def graphWindSpdDir(df):
         color='MostRecent',
         hover_data=['DateTime','WindSpeed','WindDir'],
         color_discrete_sequence= px.colors.sequential.Plasma_r)
-    fig.update_layout(coloraxis_showscale=False)
+    fig.update_layout(coloraxis_showticklabels=False)
     
     return fig
 
