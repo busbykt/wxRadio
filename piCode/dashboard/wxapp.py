@@ -57,6 +57,27 @@ def getTempHumPress():
 
 def graphWindSpdDir(df):
 
+
+    # convert wind directions to numeric
+    df['WindDir'] = df['WindDir'].replace({
+        'N':0,
+        'NNE':22.5,
+        'NE':22.5*2,
+        'ENE':22.5*3,
+        'E':90,
+        'ESE':22.5*5,
+        'SE':22.5*6,
+        'SSE':22.5*7,
+        'S':180,
+        'SSW':22.5*9,
+        'SW':22.5*10,
+        'WSW':22.5*11,
+        'W':270,
+        'WNW':22.5*13,
+        'NW':22.5*14,
+        'NNW':22.5*15
+    })
+
     fig = px.scatter_polar(df, r="WindSpeed", theta="WindDir", template='plotly_dark')
     
     return fig
