@@ -29,8 +29,11 @@ def getLatest():
     '''
     # read in data
     df = pd.read_sql_query(query,engine)
+
+    # convert from utc to pst
+    df['DateTime'] = df['DateTime'].astype('datetime64[ns]').dt.tz_localize('utc').dt.tz_convert('US/Pacific')
     
-    return df.iloc[-1]['Temperature'],df.iloc[-1]['Humidity'],df.iloc[-1]['Pressure'],df.iloc[-1]['WindSpeed'],df.iloc[-1]['WindDir'],df.iloc[-1]['BatteryVolt']
+    return df.iloc[-1]['DateTime'],df.iloc[-1]['Temperature'],df.iloc[-1]['Humidity'],df.iloc[-1]['Pressure'],df.iloc[-1]['WindSpeed'],df.iloc[-1]['WindDir'],df.iloc[-1]['BatteryVolt']
 
 
 def getTempHumPress():
@@ -54,12 +57,7 @@ def getTempHumPress():
 
 def graphWindSpdDir(df):
 
-    fig = px.scatter_polar(df, r="WindSpeed", theta="WindDir")
-    fig.update_layout(
-        plot_bgcolor=colors['background'],
-        paper_bgcolor=colors['background'],
-        font_color=colors['text']
-    )
+    fig = px.scatter_polar(df, r="WindSpeed", theta="WindDir", template='plotly_dark')
     
     return fig
 
@@ -124,22 +122,27 @@ def serveLayout():
             }
         ),
 
-        html.H3(children=f"Wind {latest[4]} {latest[3]} MPH", style={
+        html.H3(children=f"{latest[0]} PST", style={
             'textAlign': 'center',
             'color': colors['text']
         }),
 
-        html.H3(children=f"Temperature {latest[0]} F", style={
+        html.H3(children=f"Wind {latest[5]} {latest[4]} MPH", style={
+            'textAlign': 'center',
+            'color': colors['text']
+        }),
+
+        html.H3(children=f"Temperature {latest[1]} F", style={
             'textAlign': 'center',
             'color': colors['text']
         }),
         
-        html.H3(children=f"Humidity {latest[1]}%", style={
+        html.H3(children=f"Humidity {latest[2]}%", style={
             'textAlign': 'center',
             'color': colors['text']
         }),
         
-        html.H3(children=f"Pressure {latest[2]} mBar", style={
+        html.H3(children=f"Pressure {latest[3]} mBar", style={
             'textAlign': 'center',
             'color': colors['text']
         }),
