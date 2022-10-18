@@ -26,7 +26,7 @@ sshtunnel.TUNNEL_TIMEOUT = 30.0
 # read in from serial
 while True:
     try:
-        wxData = uart.read(35)
+        wxData = uart.read(40)
     except:
         wxData=None
     
@@ -35,14 +35,13 @@ while True:
         data = wxData.decode()
         print(data)
         # check to see if array has necessary components
-        checks=['T','H','P']
         if not (data.startswith('ZX') and data.endswith('QV')):
             print('missing data')
             time.sleep(.5)
             continue
         
         # clean up data
-        data = re.sub('[ZXT:PHQV]','',data)
+        data = re.sub('[ZXQV]','',data)
         print(data)
         
         try:
@@ -64,7 +63,7 @@ while True:
                 # write to database
                 cur.execute(f'''
                    INSERT INTO wxData VALUES
-                    (NOW(),{data},0,0)
+                    (NOW(),{data})
                 ''')
                 # commit transaction
                 wxdb.commit()

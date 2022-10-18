@@ -26,6 +26,9 @@ rfm9x.tx_power=15
 D11 = digitalio.DigitalInOut(board.D11)
 D11.switch_to_input(pull=digitalio.Pull.UP)
 
+# create analog in to read battery voltage
+D9 = AnalogIn(board.D9)
+
 # wind directon
 A5 = AnalogIn(board.A5)
 
@@ -87,9 +90,12 @@ def getWindSpeed():
             time.sleep(.01)
         curTime = time.monotonic()
     # compute wind speed in mph
-    windSpeed = round(count*1.492 / window,1)
+    windSpeed = round(count*1.492 / window,0)
     
     return windSpeed
+
+def getVoltage(pin):
+    return round((pin.value*2)*3.3/65536,1)
 
 while True:
 
@@ -105,10 +111,12 @@ while True:
 
     # gather environmental data from sensor
     temp = round(envSensor.temperature*9/5+32,1)
-    humidity = round(envSensor.humidity,1)
+    humidity = round(envSensor.humidity,0)
     pressure = round(envSensor.pressure,1)
 
-    packetText = str(f'ZXT:{temp},H:{humidity},P:{pressure}QV', "ascii")
+    battV = getVoltage(D9)
+
+    packetText = str(f'ZX{temp},{humidity},{pressure},{windSpeed},{windDir},{battV}QV', "ascii")
     print(packetText)
     print(f'wind speed {windSpeed}')
     print(f'wind dir {windDir}')
@@ -125,4 +133,4 @@ while True:
         print('Confirmation signal strength: {0} dB'.format(rfm9x.last_rssi))
 
         # wait to send data again if listener just confirmed receipt of packet
-        time.sleep(5)
+        time.sleep(7)

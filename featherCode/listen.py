@@ -19,7 +19,7 @@ reset = digitalio.DigitalInOut(board.RFM9X_RST)
 
 import adafruit_rfm9x
 rfm9x = adafruit_rfm9x.RFM9x(spi, cs, reset, 915.0)
-rfm9x.tx_power = 10
+rfm9x.tx_power = 15
 
 uart = busio.UART(board.TX, board.RX, baudrate=9600)
 
@@ -38,7 +38,7 @@ while True:
         print('Received reply: {0}'.format(packet_text))
         print("Received signal strength: {0} dB".format(rfm9x.last_rssi))
         print(f'battery voltage: {getVoltage(D9)}')
-        # TODO: add battery voltage and rssi to packet
+        # TODO: add rssi to packet
         # write data out
         uart.write(packet)
 

@@ -1,6 +1,6 @@
-# Run this app with `python app.py` and
-# visit http://127.0.0.1:8050/ in your web browser.
-
+'''
+Application running on pythonanywhere
+'''
 from dash import Dash, dcc, html
 import plotly.express as px
 import pandas as pd
@@ -25,12 +25,12 @@ def getLatest():
 
     # query for data to plot
     query = '''
-    SELECT DateTime,Temperature,Humidity,Pressure FROM wxData ORDER BY DateTime Desc LIMIT 2
+    SELECT * FROM wxData ORDER BY DateTime Desc LIMIT 2
     '''
     # read in data
     df = pd.read_sql_query(query,engine)
     
-    return df.iloc[-1]['Temperature'],df.iloc[-1]['Humidity'],df.iloc[-1]['Pressure']
+    return df.iloc[-1]['Temperature'],df.iloc[-1]['Humidity'],df.iloc[-1]['Pressure'],df.iloc[-1]['WindSpeed'],df.iloc[-1]['WindDir'],df.iloc[-1]['BatteryVolt']
 
 
 def getTempHumPress():
@@ -40,7 +40,7 @@ def getTempHumPress():
 
     # query for data to plot
     query = '''
-    SELECT DateTime,Temperature,Humidity,Pressure FROM wxData ORDER BY DateTime DESC LIMIT 4000
+    SELECT * FROM wxData ORDER BY DateTime DESC LIMIT 4000
     '''
     
     # read in data
@@ -52,8 +52,18 @@ def getTempHumPress():
 
     return df
 
-def graphTempHum(df):
+def graphWindSpdDir(df):
+
+    fig = px.scatter_polar(df, r="WindSpeed", theta="WindDir")
+    fig.update_layout(
+        plot_bgcolor=colors['background'],
+        paper_bgcolor=colors['background'],
+        font_color=colors['text']
+    )
     
+    return fig
+
+def graphTempHum(df):
     
     # generate the temp/humidity graph
     fig = px.line(df, x='DateTime', y=['Temperature','Humidity'])
@@ -82,6 +92,20 @@ def graphPressure(df):
 
     return fig
 
+def graphBattery(df):
+    
+    # generate the battery voltage graph
+    fig = px.line(df, x='DateTime', y=['BatteryVoltage'])
+    fig.update_layout(
+        plot_bgcolor=colors['background'],
+        paper_bgcolor=colors['background'],
+        font_color=colors['text']
+    )
+    fig.update_xaxes(showgrid=False)
+    fig.update_yaxes(showgrid=False)
+
+    return fig
+
 # layout the app
 def serveLayout():
     
@@ -93,12 +117,17 @@ def serveLayout():
     
     sLayout = html.Div(style={'backgroundColor': colors['background']}, children=[
         html.H1(
-            children='Wx Station Conditions',
+            children='Station Conditions',
             style={
                 'textAlign': 'center',
                 'color': colors['text']
             }
         ),
+
+        html.H3(children=f"Wind {latest[4]} {latest[3]} MPH", style={
+            'textAlign': 'center',
+            'color': colors['text']
+        }),
 
         html.H3(children=f"Temperature {latest[0]} F", style={
             'textAlign': 'center',
@@ -116,6 +145,11 @@ def serveLayout():
         }),
 
         dcc.Graph(
+            id='windSpdDir',
+            figure=graphWindSpdDir(df)
+        ),
+
+        dcc.Graph(
             id='tempHumGraph',
             figure=graphTempHum(df)
         ),
@@ -124,6 +158,12 @@ def serveLayout():
             id='pressureGraph',
             figure=graphPressure(df)
         ),
+    
+        dcc.Graph(
+            id='batteryVoltage',
+            figure=graphBattery(df)
+        ),
+        
         
     ])
     
