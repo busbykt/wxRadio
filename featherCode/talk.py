@@ -116,7 +116,7 @@ while True:
 
     battV = getVoltage(D9)
 
-    packetText = str(f'ZX{temp},{humidity},{pressure},{windSpeed},{windDir},{battV}QV', "ascii")
+    packetText = str(f"ZX{temp},{humidity},{pressure},{windSpeed},'{windDir}',{battV}QV", "ascii")
     print(packetText)
     print(f'wind speed {windSpeed}')
     print(f'wind dir {windDir}')
