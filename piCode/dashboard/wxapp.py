@@ -95,7 +95,7 @@ def graphPressure(df):
 def graphBattery(df):
     
     # generate the battery voltage graph
-    fig = px.line(df, x='DateTime', y=['BatteryVoltage'])
+    fig = px.line(df, x='DateTime', y=['BatteryVolt'])
     fig.update_layout(
         plot_bgcolor=colors['background'],
         paper_bgcolor=colors['background'],
