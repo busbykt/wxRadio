@@ -79,10 +79,11 @@ def graphWindSpdDir(df):
     })
 
     # generate a column defining how long ago a sample was
-    df['secondsSince'] = int((pd.to_datetime('now').tz_localize('utc').tz_convert('US/Pacific')-df['DateTime']).dt.total_seconds())
+    df['secondsSince'] = (pd.to_datetime('now').tz_localize('utc').tz_convert('US/Pacific')-df['DateTime']).dt.total_seconds()
     
     #
     df['secondsSince'] = 1/df['secondsSince'] * df['secondsSince'].mean()
+    df['secondsSince'] = df['secondsSince'].round(2)
 
     fig = px.scatter_polar(
         df, 
