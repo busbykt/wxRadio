@@ -79,20 +79,22 @@ def graphWindSpdDir(df):
     })
 
     # generate a column defining how long ago a sample was
-    df['secondsSince'] = (pd.to_datetime('now').tz_localize('utc').tz_convert('US/Pacific')-df['DateTime']).dt.total_seconds()
+    df['MostRecent'] = (pd.to_datetime('now').tz_localize('utc').tz_convert('US/Pacific')-df['DateTime']).dt.total_seconds()
     
     #
-    df['secondsSince'] = 1/df['secondsSince'] * df['secondsSince'].mean()
-    df['secondsSince'] = df['secondsSince'].round(2)
+    df['MostRecent'] = 1/df['MostRecent'] * df['MostRecent'].mean()
+    df['MostRecent'] = df['MostRecent'].round(2)
 
     fig = px.scatter_polar(
         df, 
         r="WindSpeed", 
         theta="WindDir", 
         template='plotly_dark', 
-        size='secondsSince', 
-        color='secondsSince',
+        size='MostRecent', 
+        color='MostRecent',
+        hover_data=['DateTime','WindSpeed','WindDir'],
         color_discrete_sequence= px.colors.sequential.Plasma_r)
+    fig.update_layout(coloraxis_showscale=False)
     
     return fig
 
