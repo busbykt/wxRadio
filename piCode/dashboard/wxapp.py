@@ -79,7 +79,7 @@ def graphWindSpdDir(df):
     })
 
     # generate a column defining how long ago a sample was
-    df['secondsSince'] = (pd.to_datetime('now')-df['DateTime']).total_seconds()
+    df['secondsSince'] = (pd.to_datetime('now').dt.tz_localize('utc').dt.tz_convert('US/Pacific')-df['DateTime']).total_seconds()
 
     fig = px.scatter_polar(df, r="WindSpeed", theta="WindDir", template='plotly_dark', size='secondsSince')
     
