@@ -178,12 +178,12 @@ def serveLayout():
             'color': colors['text']
         }),
 
-        html.H3(children=f"Wind {latest['WindSpeed']} {latest[4]} MPH", style={
+        html.H3(children=f"Wind {latest['WindDir']} {latest['WindSpeed']} MPH", style={
             'textAlign': 'center',
             'color': colors['text']
         }),
 
-        html.H3(children=f"Temperature {latest['WindDir']} F", style={
+        html.H3(children=f"Temperature {latest['Temperature']} F", style={
             'textAlign': 'center',
             'color': colors['text']
         }),
