@@ -32,13 +32,15 @@ while True:
     else:
         try:
             packet_text = str(packet,'ascii')
+
         except UnicodeError:
             continue
 
-        print('Received reply: {0}'.format(packet_text))
+        packet = bytes(packet_text+f',{rfm9x.last_rssi:.0f}','ascii')
+
+        print('Received reply: {0}'.format(str(packet,'ascii')))
         print("Received signal strength: {0} dB".format(rfm9x.last_rssi))
         print(f'battery voltage: {getVoltage(D9)}')
-        # TODO: add rssi to packet
         # write data out
         uart.write(packet)
 

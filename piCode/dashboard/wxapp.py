@@ -33,7 +33,7 @@ def getLatest():
     # convert from utc to pst
     df['DateTime'] = df['DateTime'].astype('datetime64[ns]').dt.tz_localize('utc').dt.tz_convert('US/Pacific')
     
-    return df.iloc[-1]['DateTime'],df.iloc[-1]['Temperature'],df.iloc[-1]['Humidity'],df.iloc[-1]['Pressure'],df.iloc[-1]['WindSpeed'],df.iloc[-1]['WindDir'],df.iloc[-1]['BatteryVolt']
+    return df.iloc[-1]
 
 
 def getTempHumPress():
@@ -141,6 +141,20 @@ def graphBattery(df):
 
     return fig
 
+def graphRSSI(df):
+    
+    # generate the RSSI graph
+    fig = px.line(df, x='DateTime', y=['RSSI'])
+    fig.update_layout(
+        plot_bgcolor=colors['background'],
+        paper_bgcolor=colors['background'],
+        font_color=colors['text']
+    )
+    fig.update_xaxes(showgrid=False)
+    fig.update_yaxes(showgrid=False)
+
+    return fig
+
 # layout the app
 def serveLayout():
     
@@ -159,27 +173,27 @@ def serveLayout():
             }
         ),
 
-        html.H3(children=f"{latest[0]} PST", style={
+        html.H3(children=f"{latest['DateTime']} PST", style={
             'textAlign': 'center',
             'color': colors['text']
         }),
 
-        html.H3(children=f"Wind {latest[5]} {latest[4]} MPH", style={
+        html.H3(children=f"Wind {latest['WindSpeed']} {latest[4]} MPH", style={
             'textAlign': 'center',
             'color': colors['text']
         }),
 
-        html.H3(children=f"Temperature {latest[1]} F", style={
+        html.H3(children=f"Temperature {latest['WindDir']} F", style={
             'textAlign': 'center',
             'color': colors['text']
         }),
         
-        html.H3(children=f"Humidity {latest[2]}%", style={
+        html.H3(children=f"Humidity {latest['Humidity']}%", style={
             'textAlign': 'center',
             'color': colors['text']
         }),
         
-        html.H3(children=f"Pressure {latest[3]} mBar", style={
+        html.H3(children=f"Pressure {latest['Pressure']} mBar", style={
             'textAlign': 'center',
             'color': colors['text']
         }),
