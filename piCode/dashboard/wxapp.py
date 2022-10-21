@@ -33,7 +33,7 @@ def getLatest():
     # convert from utc to pst
     df['DateTime'] = df['DateTime'].astype('datetime64[ns]').dt.tz_localize('utc').dt.tz_convert('US/Pacific')
     
-    return df.iloc[-1]
+    return df.iloc[0]
 
 
 def getTempHumPress():
