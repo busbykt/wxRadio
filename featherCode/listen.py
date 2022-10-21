@@ -36,7 +36,7 @@ while True:
         except UnicodeError:
             continue
 
-        packet = bytes(packet_text+f',{rfm9x.last_rssi:.0f}','ascii')
+        packet = bytes(packet_text+f',{rfm9x.last_rssi:.0f}QV','ascii')
 
         print('Received reply: {0}'.format(str(packet,'ascii')))
         print("Received signal strength: {0} dB".format(rfm9x.last_rssi))

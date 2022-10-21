@@ -64,7 +64,7 @@ def getWindDir():
         if dist < minDist:
             minDist = dist
             bestDirection = direction
-   
+
     return bestDirection
 
 def getWindSpeed():
@@ -91,7 +91,7 @@ def getWindSpeed():
         curTime = time.monotonic()
     # compute wind speed in mph
     windSpeed = round(count*1.492 / window,0)
-    
+
     return windSpeed
 
 def getVoltage(pin):
@@ -105,7 +105,7 @@ while True:
 
     # get wind speed
     windSpeed = getWindSpeed()
-        
+
     # get wind direction
     windDir = getWindDir()
 
@@ -116,7 +116,7 @@ while True:
 
     battV = getVoltage(D9)
 
-    packetText = str(f"ZX{temp},{humidity},{pressure},{windSpeed},'{windDir}',{battV}QV", "ascii")
+    packetText = str(f"ZX{temp},{humidity},{pressure},{windSpeed},'{windDir}',{battV}", "ascii")
     print(packetText)
     print(f'wind speed {windSpeed}')
     print(f'wind dir {windDir}')

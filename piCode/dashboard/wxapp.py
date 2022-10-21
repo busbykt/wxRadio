@@ -218,6 +218,10 @@ def serveLayout():
             figure=graphBattery(df)
         ),
         
+        dcc.Graph(
+            id='RSSIGraph',
+            figure=graphRSSI(df)
+        ),
         
     ])
     
