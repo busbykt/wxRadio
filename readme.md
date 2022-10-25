@@ -1,5 +1,6 @@
 # wxRadio
-Project for transmitting weather data from remote location
+Project for transmitting weather data from remote location. See the current [Dashboard](https://busbykt.pythonanywhere.com/).
+
 
 ## Equipment
 - RaspberryPi4
